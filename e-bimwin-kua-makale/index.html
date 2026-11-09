@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123f32">
+  <meta name="description" content="E-BIMWIN KUA Makale — layanan bimbingan perkawinan digital bagi calon pengantin.">
+  <title>E-BIMWIN KUA MAKALE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <header class="topbar">
+    <a class="brand" href="#" data-route="home" aria-label="E-Bimwin KUA Makale">
+      <span class="brand-mark">✦</span><span><b>E-BIMWIN</b><small>KUA MAKALE</small></span>
+    </a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Buka navigasi">☰</button>
+    <nav id="mainNav">
+      <a href="#home" data-route="home">Beranda</a>
+      <a href="#dashboard" data-route="dashboard">Dashboard</a>
+      <a href="#help" data-route="help">Bantuan</a>
+      <button id="navAuth" class="btn btn-outline btn-small">Masuk</button>
+    </nav>
+  </header>
+
+  <main id="app">
+    <section class="hero page" id="page-home">
+      <div class="hero-copy">
+        <span class="eyebrow"><span class="dot"></span> LAYANAN BIMBINGAN PERKAWINAN DIGITAL</span>
+        <h1>Mempersiapkan cinta,<br><em>menguatkan keluarga.</em></h1>
+        <p class="hero-lead">Membangun Keluarga Sakinah, Berawal dari Persiapan yang Matang.</p>
+        <p class="muted">Ikuti pembelajaran Bimbingan Perkawinan secara bertahap, fleksibel, dan mudah diakses melalui ponsel Anda.</p>
+        <div class="hero-actions">
+          <button class="btn btn-gold" data-action="start">Mulai Bimbingan <span>→</span></button>
+          <button class="btn btn-ghost" data-route="help">Pelajari layanan</button>
+        </div>
+        <div class="trust-row"><span>✓ Belajar mandiri</span><span>✓ Dua modul utama</span><span>✓ Evaluasi pembelajaran</span></div>
+      </div>
+      <div class="hero-art">
+        <div class="sun"></div><div class="arch"></div>
+        <div class="family-card">
+          <div class="family-illustration" aria-hidden="true">
+            <div class="leaf leaf-a"></div><div class="leaf leaf-b"></div>
+            <div class="person person-one"><i></i></div><div class="person person-two"><i></i></div>
+            <div class="child"></div><div class="ground"></div>
+          </div>
+          <div class="family-caption"><span>بَيْتِي جَنَّتِي</span><b>Rumah yang penuh ketenangan</b><small>Dimulai dari saling memahami.</small></div>
+        </div>
+        <div class="floating-note"><span>✧</span><div><b>Belajar bertahap</b><small>Ikuti progres Anda</small></div></div>
+      </div>
+    </section>
+
+    <section class="page section-wrap" id="page-home-more">
+      <div class="section-heading"><span class="eyebrow">ALUR BIMBINGAN</span><h2>Perjalanan menuju keluarga sakinah</h2><p class="muted">Selesaikan setiap tahap sesuai urutan. Progres Anda tersimpan pada perangkat ini dalam mode demo.</p></div>
+      <div class="steps">
+        <article><span>01</span><b>Daftar & Biodata</b><p>Buat akun dan lengkapi identitas calon pengantin.</p></article>
+        <article><span>02</span><b>Pre-test</b><p>Kenali pengetahuan awal sebelum belajar.</p></article>
+        <article><span>03</span><b>Dua Modul</b><p>Pelajari keluarga sakinah dan psikologi keluarga.</p></article>
+        <article><span>04</span><b>Post-test</b><p>Ukur perkembangan pengetahuan Anda.</p></article>
+      </div>
+      <div class="callout"><div><span class="eyebrow">PESAN BIMWIN</span><h3>Pernikahan bukan hanya tentang menemukan pasangan, tetapi juga belajar menjadi pasangan.</h3></div><span class="callout-star">✦</span></div>
+    </section>
+
+    <section class="page auth-page hidden" id="page-auth">
+      <div class="auth-aside"><span class="brand-mark large">✦</span><h2>Langkah pertama<br>dimulai di sini.</h2><p>Siapkan diri, bangun komunikasi, dan tumbuhkan komitmen bersama.</p></div>
+      <div class="auth-panel">
+        <button class="back-link" data-route="home">← Kembali ke beranda</button>
+        <div class="tabs"><button class="tab active" data-auth-tab="login">Masuk</button><button class="tab" data-auth-tab="register">Daftar akun</button></div>
+        <form id="loginForm" class="auth-form">
+          <h2>Selamat datang</h2><p class="muted">Masuk untuk melanjutkan pembelajaran Anda.</p>
+          <label>Nomor HP<input name="phone" type="tel" inputmode="tel" placeholder="08xxxxxxxxxx" required></label>
+          <label>Password<div class="password-wrap"><input name="password" type="password" required minlength="6"><button type="button" class="show-pass">Lihat</button></div></label>
+          <button class="btn btn-primary full" type="submit">Masuk ke akun</button>
+          <p class="tiny muted">Mode demo: akun tersimpan di browser ini, bukan database server.</p>
+        </form>
+        <form id="registerForm" class="auth-form hidden">
+          <h2>Buat akun peserta</h2><p class="muted">Gunakan nomor HP aktif sebagai identitas akun.</p>
+          <label>Nama lengkap<input name="name" required maxlength="120" autocomplete="name"></label>
+          <label>Nomor HP<input name="phone" type="tel" inputmode="tel" placeholder="08xxxxxxxxxx" required></label>
+          <label>Jenis kelamin<select name="gender" required><option value="">Pilih</option><option value="Perempuan">Perempuan</option><option value="Laki-laki">Laki-laki</option></select></label>
+          <label>Email (opsional)<input name="email" type="email"></label>
+          <label>Password<div class="password-wrap"><input name="password" type="password" minlength="8" required><button type="button" class="show-pass">Lihat</button></div></label>
+          <label>Konfirmasi password<input name="confirm" type="password" minlength="8" required></label>
+          <label class="checkline"><input type="checkbox" required> Saya menyetujui kebijakan privasi dan penggunaan data untuk layanan Bimwin.</label>
+          <button class="btn btn-primary full" type="submit">Daftar sekarang</button>
+          <p class="tiny muted">Jangan gunakan kata sandi penting pada mode demo.</p>
+        </form>
+      </div>
+    </section>
+
+    <section class="page dashboard-page hidden" id="page-dashboard">
+      <div class="dash-head"><div><span class="eyebrow">RUANG PESERTA</span><h1>Dashboard pembelajaran</h1><p class="muted" id="welcomeText">Selamat datang.</p></div><button class="btn btn-outline btn-small" data-action="logout">Keluar</button></div>
+      <div class="progress-card"><div><span class="eyebrow">PROGRES KESELURUHAN</span><strong id="overallPct">0%</strong><p class="muted" id="overallText">Mulai perjalanan Bimwin Anda.</p></div><div class="progress-track"><span id="overallBar"></span></div></div>
+      <div class="dash-grid">
+        <article class="dash-card"><span class="card-icon">01</span><h3>Data diri</h3><p id="profileStatus">Belum dilengkapi</p><button class="text-button" data-route="profile">Lengkapi biodata →</button></article>
+        <article class="dash-card"><span class="card-icon">02</span><h3>Pre-test</h3><p id="preStatus">Belum dikerjakan</p><button class="text-button" data-action="pretest">Mulai pre-test →</button></article>
+        <article class="dash-card"><span class="card-icon">03</span><h3>Modul 1</h3><p id="m1Status">0 dari 4 subbab</p><button class="text-button" data-action="module" data-module="1">Buka modul →</button></article>
+        <article class="dash-card"><span class="card-icon">04</span><h3>Modul 2</h3><p id="m2Status">0 dari 7 subbab</p><button class="text-button" data-action="module" data-module="2">Buka modul →</button></article>
+        <article class="dash-card"><span class="card-icon">05</span><h3>Post-test</h3><p id="postStatus">Menunggu penyelesaian modul</p><button class="text-button" data-action="posttest">Buka post-test →</button></article>
+        <article class="dash-card"><span class="card-icon">06</span><h3>Hasil belajar</h3><p id="resultStatus">Belum tersedia</p><button class="text-button" data-route="results">Lihat hasil →</button></article>
+      </div>
+      <div class="dash-bottom"><div><h3>Profil peserta</h3><p id="profileSummary" class="muted">Lengkapi biodata untuk memulai.</p></div><button class="btn btn-outline btn-small" data-route="profile">Edit biodata</button></div>
+    </section>
+
+    <section class="page content-page hidden" id="page-profile">
+      <div class="page-title"><span class="eyebrow">DATA PESERTA</span><h1>Biodata calon pengantin</h1><p class="muted">Lengkapi data dengan benar. Kolom bertanda * wajib diisi.</p></div>
+      <form id="profileForm" class="form-card">
+        <h3>Identitas diri</h3><div class="form-grid">
+          <label>Nama lengkap *<input name="fullName" required></label><label>Nama ayah *<input name="father" required></label>
+          <label>Tempat lahir *<input name="birthPlace" required></label><label>Tanggal lahir *<input name="birthDate" type="date" required></label>
+          <label>Jenis kelamin *<select name="gender" required><option value="">Pilih</option><option>Perempuan</option><option>Laki-laki</option></select></label>
+          <label>Pendidikan terakhir *<select name="education" required><option value="">Pilih</option><option>SD/MI</option><option>SMP/MTs</option><option>SMA/MA/SMK</option><option>Diploma</option><option>S1</option><option>S2</option><option>S3</option></select></label>
+          <label class="span-2">Alamat lengkap *<textarea name="address" rows="2" required></textarea></label>
+          <label>Anak ke-berapa *<input name="birthOrder" placeholder="Contoh: 2 dari 4" required></label><label>Pekerjaan *<input name="job" required></label>
+        </div>
+        <h3>Identitas pasangan & rencana perkawinan</h3><div class="form-grid">
+          <label>Nama calon pasangan *<input name="partnerName" required></label><label>Nomor HP pasangan<input name="partnerPhone" type="tel"></label>
+          <label>Rencana tanggal perkawinan<input name="weddingDate" type="date"></label><label>Kecamatan/KUA tempat mendaftar *<input name="kua" value="KUA Kecamatan Makale" required></label>
+          <label>Status keikutsertaan Bimwin<select name="attendance"><option>Belum mengikuti</option><option>Sedang mengikuti</option><option>Telah menyelesaikan</option></select></label>
+        </div>
+        <div class="form-actions"><span class="tiny muted">Data disimpan pada browser (mode demo).</span><button class="btn btn-primary" type="submit">Simpan biodata</button></div>
+      </form>
+    </section>
+
+    <section class="page content-page hidden" id="page-module">
+      <div class="module-top"><button class="back-link" data-route="dashboard">← Dashboard</button><span class="eyebrow" id="moduleEyebrow">MODUL PEMBELAJARAN</span></div>
+      <div class="module-layout"><aside class="lesson-nav"><h3 id="moduleNavTitle">Daftar subbab</h3><div id="lessonList"></div><div class="mini-progress"><span>Progres modul</span><b id="modulePct">0%</b><div class="progress-track"><span id="moduleBar"></span></div></div></aside>
+        <article class="lesson-content"><div class="lesson-meta" id="lessonMeta"></div><h1 id="lessonTitle"></h1><div id="lessonBody" class="lesson-body"></div><div id="lessonActivity"></div><div class="lesson-footer"><button class="btn btn-outline" id="prevLesson">← Sebelumnya</button><button class="btn btn-primary" id="completeLesson">Tandai selesai & lanjut →</button></div></article>
+      </div>
+    </section>
+
+    <section class="page content-page hidden" id="page-test">
+      <div class="page-title"><span class="eyebrow" id="testEyebrow">EVALUASI PEMBELAJARAN</span><h1 id="testTitle">Pre-test</h1><p class="muted">Pilih satu jawaban yang paling tepat. Anda dapat meninjau soal sebelum mengirim.</p></div>
+      <div class="test-card"><div class="test-head"><span id="testCounter">Soal 1 dari 20</span><span id="testProgressLabel">5%</span></div><div class="progress-track"><span id="testProgress"></span></div><div id="questionArea"></div><div class="question-nav" id="questionNav"></div><div class="test-actions"><button class="btn btn-outline" id="testPrev">Sebelumnya</button><button class="btn btn-primary" id="testNext">Berikutnya</button><button class="btn btn-gold hidden" id="testSubmit">Kirim jawaban</button></div></div>
+    </section>
+
+    <section class="page content-page hidden" id="page-results">
+      <div class="page-title"><span class="eyebrow">RINGKASAN PEMBELAJARAN</span><h1>Hasil pembelajaran Anda</h1><p class="muted">Evaluasi pengetahuan bukan diagnosis psikologis atau penentu kelayakan menikah.</p></div>
+      <div class="result-grid"><div class="result-score"><span>PRE-TEST</span><strong id="resultPre">—</strong><small>Skala 0–100</small></div><div class="result-score featured"><span>POST-TEST</span><strong id="resultPost">—</strong><small>Skala 0–100</small></div><div class="result-score"><span>PENINGKATAN</span><strong id="resultDelta">—</strong><small>Selisih nilai</small></div></div>
+      <div class="form-card"><h3>Perbandingan nilai</h3><div class="bar-chart"><div><span>Pre-test</span><div class="chart-track"><i id="preChart"></i></div><b id="preChartLabel">—</b></div><div><span>Post-test</span><div class="chart-track"><i id="postChart"></i></div><b id="postChartLabel">—</b></div></div><p id="completionNote" class="muted"></p><button class="btn btn-outline" onclick="window.print()">Cetak hasil</button></div>
+    </section>
+
+    <section class="page content-page hidden" id="page-admin">
+      <div class="dash-head"><div><span class="eyebrow">PENGELOLAAN KUA</span><h1>Dashboard administrator</h1><p class="muted">Mode demo hanya menampilkan data pada perangkat ini.</p></div><button class="btn btn-outline btn-small" data-action="logout">Keluar</button></div>
+      <div class="admin-stats" id="adminStats"></div>
+      <div class="form-card"><div class="table-head"><h3>Daftar peserta lokal</h3><input id="adminSearch" placeholder="Cari nama / nomor HP"></div><div class="table-scroll"><table><thead><tr><th>Nama</th><th>Nomor HP</th><th>Pre-test</th><th>Modul</th><th>Post-test</th></tr></thead><tbody id="adminRows"></tbody></table></div><p class="tiny muted">Ekspor ini hanya berisi data demo yang ada di browser ini.</p><div class="form-actions"><button class="btn btn-outline btn-small" data-action="export-csv">Ekspor CSV</button><button class="btn btn-outline btn-small" data-action="export-json">Ekspor JSON</button></div></div>
+    </section>
+
+    <section class="page content-page hidden" id="page-help">
+      <div class="page-title"><span class="eyebrow">PUSAT BANTUAN</span><h1>Bagaimana kami dapat membantu?</h1><p class="muted">Panduan singkat menggunakan layanan E-Bimwin.</p></div>
+      <div class="faq-list">
+        <details open><summary>Apakah bimbingan ini dapat diikuti melalui HP?</summary><p>Ya. Website dirancang responsif agar dapat digunakan melalui smartphone, tablet, maupun komputer.</p></details>
+        <details><summary>Apakah nilai pre-test menentukan kelulusan?</summary><p>Tidak. Pre-test digunakan untuk memetakan pengetahuan awal. Fokus utama adalah mengikuti pembelajaran dan memahami materi.</p></details>
+        <details><summary>Apakah progres tersimpan jika saya keluar?</summary><p>Dalam prototipe ini progres tersimpan di penyimpanan browser pada perangkat yang sama. Untuk penyimpanan lintas perangkat dan permanen, website harus dihubungkan ke Supabase.</p></details>
+        <details><summary>Bagaimana jika lupa password?</summary><p>Fitur pemulihan akun memerlukan backend autentikasi dan verifikasi nomor HP/email. Fitur tersebut belum aktif pada mode demo.</p></details>
+      </div>
+      <div class="contact-strip"><div><b>Butuh bantuan petugas KUA?</b><p class="muted">Hubungi KUA Kecamatan Makale melalui kanal layanan resmi.</p></div><a class="btn btn-primary" href="https://kemenag.go.id/" target="_blank" rel="noopener">Situs Kemenag ↗</a></div>
+    </section>
+  </main>
+  <footer><div class="footer-brand"><span class="brand-mark">✦</span><b>E-BIMWIN KUA MAKALE</b></div><p>Kementerian Agama Kabupaten Tana Toraja</p><small>© <span id="year"></span> Layanan Bimbingan Perkawinan Digital · Prototipe pengembangan</small><p><button class="text-button" data-action="admin-demo" style="color:#dfc78f">Pratinjau dashboard admin (demo)</button></p></footer>
+  <script src="script.js"></script>
+</body>
+</html>

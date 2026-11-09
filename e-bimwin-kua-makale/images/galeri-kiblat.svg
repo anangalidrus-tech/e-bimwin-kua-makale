@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 533" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a1a15" />
+      <stop offset="50%" stop-color="#14362b" />
+      <stop offset="100%" stop-color="#081410" />
+    </linearGradient>
+    <radialGradient id="glow3" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="0.32" />
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="compassGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFBEB" />
+      <stop offset="40%" stop-color="#FBBF24" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+    <filter id="softGlow3" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <rect width="800" height="533" fill="url(#bgGrad3)" />
+  <rect width="800" height="533" fill="url(#glow3)" />
+
+  <!-- Celestial Compass Grid -->
+  <g opacity="0.18" stroke="#34d399" stroke-width="1.5" fill="none">
+    <circle cx="400" cy="210" r="140" />
+    <circle cx="400" cy="210" r="165" stroke-dasharray="4,6" />
+    <circle cx="400" cy="210" r="190" />
+    <line x1="400" y1="40" x2="400" y2="380" />
+    <line x1="230" y1="210" x2="570" y2="210" />
+    <line x1="280" y1="90" x2="520" y2="330" stroke-dasharray="3,5" />
+    <line x1="520" y1="90" x2="280" y2="330" stroke-dasharray="3,5" />
+  </g>
+
+  <!-- Compass Rose & Kaaba Direction Pointer -->
+  <g transform="translate(400, 210)" filter="url(#softGlow3)">
+    <!-- Dial Outer -->
+    <circle cx="0" cy="0" r="110" fill="none" stroke="url(#compassGold)" stroke-width="3" />
+    <!-- Ticks -->
+    <path d="M0,-110 V-95 M0,110 V95 M-110,0 H-95 M110,0 H95" stroke="url(#compassGold)" stroke-width="2.5" />
+    
+    <!-- Compass Pointer (Pointing slightly northwest ~293 degrees for Indonesia Kiblat) -->
+    <g transform="rotate(-67)">
+      <!-- North/Kiblat Needle (Gold / Emerald) -->
+      <polygon points="0,-85 14,0 0,-10 -14,0" fill="url(#compassGold)" />
+      <!-- South Needle -->
+      <polygon points="0,85 14,0 0,10 -14,0" fill="#047857" opacity="0.8" />
+    </g>
+
+    <!-- Center Hub -->
+    <circle cx="0" cy="0" r="14" fill="#111827" stroke="url(#compassGold)" stroke-width="3" />
+    <circle cx="0" cy="0" r="6" fill="#FBBF24" />
+
+    <!-- Minaret/Crescent Accent -->
+    <path d="M-6,-45 A8,8 0 0,1 -6,-31 A6,6 0 0,0 -6,-45" fill="#FBBF24" />
+  </g>
+
+  <!-- Badge Plate -->
+  <rect x="190" y="360" width="420" height="42" rx="21"
+        fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.2)" />
+  <text x="400" y="387" text-anchor="middle" fill="#FFFFFF"
+        font-family="'Poppins', sans-serif" font-weight="700" font-size="16" letter-spacing="1">
+    PENGUKURAN ARAH KIBLAT
+  </text>
+
+  <text x="400" y="430" text-anchor="middle" fill="#A7F3D0"
+        font-family="'Inter', sans-serif" font-size="13" font-weight="500">
+    Kalibrasi Akurat Falakiyah Masjid &amp; Mushalla di Makale
+  </text>
+  <text x="400" y="455" text-anchor="middle" fill="#9CA3AF"
+        font-family="'Inter', sans-serif" font-size="11" letter-spacing="2">
+    PRESISI • HISAB RUKYAT • SYARI
+  </text>
+</svg>

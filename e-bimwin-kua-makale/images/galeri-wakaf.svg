@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 533" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#19200f" />
+      <stop offset="50%" stop-color="#2a3a19" />
+      <stop offset="100%" stop-color="#0e1408" />
+    </linearGradient>
+    <radialGradient id="glow6" cx="50%" cy="38%" r="55%">
+      <stop offset="0%" stop-color="#eab308" stop-opacity="0.28" />
+      <stop offset="100%" stop-color="#eab308" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="goldSprout" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FEF08A" />
+      <stop offset="50%" stop-color="#EAB308" />
+      <stop offset="100%" stop-color="#CA8A04" />
+    </linearGradient>
+    <filter id="softGlow6" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <rect width="800" height="533" fill="url(#bgGrad6)" />
+  <rect width="800" height="533" fill="url(#glow6)" />
+
+  <!-- Geometric rings -->
+  <g opacity="0.12" stroke="#eab308" stroke-width="1.5" fill="none">
+    <circle cx="400" cy="205" r="160" />
+    <circle cx="400" cy="205" r="210" stroke-dasharray="6,6" />
+  </g>
+
+  <!-- Wakaf Hands & Growing Sprout / Certificate Emblem -->
+  <g transform="translate(400, 205)" filter="url(#softGlow6)">
+    <!-- Supporting Hands -->
+    <path d="M-60,40 C-40,20 -20,30 0,45 C20,30 40,20 60,40" fill="none" stroke="url(#goldSprout)" stroke-width="4.5" stroke-linecap="round" />
+    
+    <!-- Sprout / Young Tree growing from hands -->
+    <path d="M0,45 V-15" stroke="url(#goldSprout)" stroke-width="4" stroke-linecap="round" />
+    <!-- Left Leaf -->
+    <path d="M0,-5 C-25,-5 -35,-30 0,-40" fill="none" stroke="#A3E635" stroke-width="3.5" />
+    <!-- Right Leaf -->
+    <path d="M0,-15 C25,-15 35,-40 0,-50" fill="none" stroke="#A3E635" stroke-width="3.5" />
+    <!-- Top Bud -->
+    <circle cx="0" cy="-55" r="6" fill="#FEF08A" />
+
+    <!-- Wakaf Land / Building Symbol -->
+    <path d="M-90,-10 L-70,-30 L-50,-10 V15 H-90 Z" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2.5" />
+    <path d="M50,-10 L70,-30 L90,-10 V15 H50 Z" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2.5" />
+  </g>
+
+  <!-- Badge Plate -->
+  <rect x="180" y="360" width="440" height="42" rx="21"
+        fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.2)" />
+  <text x="400" y="387" text-anchor="middle" fill="#FFFFFF"
+        font-family="'Poppins', sans-serif" font-weight="700" font-size="16" letter-spacing="1">
+    PEMBERDAYAAN ZAKAT &amp; WAKAF
+  </text>
+
+  <text x="400" y="430" text-anchor="middle" fill="#FEF08A"
+        font-family="'Inter', sans-serif" font-size="13" font-weight="500">
+    Sertifikasi Tanah Wakaf &amp; Edukasi ZIS untuk Kemaslahatan Umat
+  </text>
+  <text x="400" y="455" text-anchor="middle" fill="#CA8A04"
+        font-family="'Inter', sans-serif" font-size="11" letter-spacing="2">
+    AKUNTABEL • PRODUKTIF • ABADI
+  </text>
+</svg>

@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 533" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0e1f2b" />
+      <stop offset="50%" stop-color="#143b44" />
+      <stop offset="100%" stop-color="#0a171d" />
+    </linearGradient>
+    <radialGradient id="glow2" cx="50%" cy="38%" r="60%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="tealGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#67e8f9" />
+      <stop offset="50%" stop-color="#06b6d4" />
+      <stop offset="100%" stop-color="#0e7490" />
+    </linearGradient>
+    <linearGradient id="goldGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+    <filter id="softGlow2" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <rect width="800" height="533" fill="url(#bgGrad2)" />
+  <rect width="800" height="533" fill="url(#glow2)" />
+
+  <!-- Background Lines -->
+  <g opacity="0.12" stroke="#38bdf8" stroke-width="1.5" fill="none">
+    <circle cx="400" cy="210" r="170" />
+    <circle cx="400" cy="210" r="220" stroke-dasharray="8,8" />
+    <line x1="150" y1="210" x2="650" y2="210" stroke-dasharray="4,6" />
+  </g>
+
+  <!-- Open Book & Guiding Star Emblem -->
+  <g transform="translate(400, 200)" filter="url(#softGlow2)">
+    <!-- Book Leaves -->
+    <path d="M0,-10 C-45,-45 -95,-35 -130,-20 V55 C-95,40 -45,30 0,55 C45,30 95,40 130,55 V-20 C95,-35 45,-45 0,-10 Z"
+          fill="none" stroke="url(#tealGrad)" stroke-width="5" />
+    <path d="M0,-10 V55" stroke="url(#tealGrad)" stroke-width="4" />
+    <line x1="-100" y1="3" x2="-25" y2="-6" stroke="rgba(255,255,255,0.4)" stroke-width="3" stroke-linecap="round" />
+    <line x1="-100" y1="20" x2="-25" y2="11" stroke="rgba(255,255,255,0.4)" stroke-width="3" stroke-linecap="round" />
+    <line x1="25" y1="-6" x2="100" y2="3" stroke="rgba(255,255,255,0.4)" stroke-width="3" stroke-linecap="round" />
+    <line x1="25" y1="11" x2="100" y2="20" stroke="rgba(255,255,255,0.4)" stroke-width="3" stroke-linecap="round" />
+
+    <!-- Guiding Sparkle Star Above -->
+    <g transform="translate(0, -65)">
+      <polygon points="0,-25 6,-7 24,-1 8,6 12,24 0,11 -12,24 -8,6 -24,-1 -6,-7" fill="url(#goldGrad2)" />
+      <circle cx="0" cy="0" r="4" fill="#FFFFFF" />
+    </g>
+  </g>
+
+  <!-- Badge Plate -->
+  <rect x="200" y="360" width="400" height="42" rx="21"
+        fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.2)" />
+  <text x="400" y="387" text-anchor="middle" fill="#FFFFFF"
+        font-family="'Poppins', sans-serif" font-weight="700" font-size="16" letter-spacing="1">
+    BIMBINGAN PERKAWINAN (BIMWIN)
+  </text>
+
+  <text x="400" y="430" text-anchor="middle" fill="#BAE6FD"
+        font-family="'Inter', sans-serif" font-size="13" font-weight="500">
+    Pembekalan Calon Pengantin Menuju Keluarga Sakinah
+  </text>
+  <text x="400" y="455" text-anchor="middle" fill="#94A3B8"
+        font-family="'Inter', sans-serif" font-size="11" letter-spacing="2">
+    FONDASI KELUARGA KOKOH &amp; HARMONIS
+  </text>
+</svg>
