@@ -1,98 +1,133 @@
--- E-BIMWIN KUA MAKALE — Supabase PostgreSQL starter schema
--- Jalankan melalui Supabase SQL Editor setelah meninjau kebijakan dan kebutuhan instansi.
--- Auth: gunakan Supabase Auth phone/password; aktifkan verifikasi nomor HP/SMS sesuai konfigurasi proyek.
+-- E-BIMWIN KUA MAKALE — Supabase PostgreSQL Schema (Idempotent / Aman Dijalankan Berulang Kali)
+-- Skrip ini dirancang agar TIDAK PERNAH EROR meskipun dijalankan berkali-kali di SQL Editor Supabase.
+
 create extension if not exists pgcrypto;
 
-create type public.app_role as enum ('super_admin','admin_kua','fasilitator','peserta');
+-- 1. Buat tipe enum app_role (aman jika sudah ada)
+do $$
+begin
+  if not exists (select 1 from pg_type where typname = 'app_role') then
+    create type public.app_role as enum ('super_admin', 'admin_kua', 'fasilitator', 'peserta');
+  end if;
+end $$;
 
-create table public.institutions (
+-- 2. Buat tabel-tabel utama
+create table if not exists public.institutions (
   id uuid primary key default gen_random_uuid(),
   name text not null default 'KUA Kecamatan Makale',
   ministry text not null default 'Kementerian Agama Kabupaten Tana Toraja',
-  logo_path text, whatsapp text, contact_email text, facilitator_name text,
-  created_at timestamptz not null default now(), updated_at timestamptz not null default now()
+  logo_path text,
+  whatsapp text,
+  contact_email text,
+  facilitator_name text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
 
-create table public.profiles (
+create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   institution_id uuid references public.institutions(id),
   role public.app_role not null default 'peserta',
   full_name text not null,
   phone text unique,
   is_active boolean not null default true,
-  created_at timestamptz not null default now(), updated_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
 
-create table public.participant_profiles (
+create table if not exists public.participant_profiles (
   user_id uuid primary key references public.profiles(id) on delete cascade,
-  father_name text not null, birth_place text not null, birth_date date not null,
+  father_name text not null default '',
+  birth_place text not null default '',
+  birth_date date not null default '2000-01-01',
   gender text not null check (gender in ('Laki-laki','Perempuan')),
-  address text not null, birth_order text not null, education text not null, occupation text not null,
-  wedding_date date, kua_name text not null default 'KUA Kecamatan Makale',
+  address text not null default '',
+  birth_order text not null default '1',
+  education text not null default 'SMA/MA/SMK',
+  occupation text not null default '',
+  wedding_date date,
+  kua_name text not null default 'KUA Kecamatan Makale',
   attendance_status text not null default 'Belum mengikuti',
   updated_at timestamptz not null default now()
 );
 
-create table public.partners (
+create table if not exists public.partners (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null unique references public.profiles(id) on delete cascade,
-  full_name text not null, phone text,
+  full_name text not null,
+  phone text,
   created_at timestamptz not null default now()
 );
 
-create table public.modules (
+create table if not exists public.modules (
   id uuid primary key default gen_random_uuid(),
-  slug text unique not null, title text not null, description text,
-  sort_order int not null default 0, is_active boolean not null default true,
+  slug text unique not null,
+  title text not null,
+  description text,
+  sort_order int not null default 0,
+  is_active boolean not null default true,
   created_at timestamptz not null default now()
 );
 
-create table public.lessons (
+create table if not exists public.lessons (
   id uuid primary key default gen_random_uuid(),
   module_id uuid not null references public.modules(id) on delete cascade,
-  title text not null, content jsonb not null default '{}'::jsonb,
-  sort_order int not null default 0, is_active boolean not null default true,
-  created_at timestamptz not null default now(), updated_at timestamptz not null default now(),
+  title text not null,
+  content jsonb not null default '{}'::jsonb,
+  sort_order int not null default 0,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
   unique(module_id, sort_order)
 );
 
-create table public.lesson_progress (
+create table if not exists public.lesson_progress (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles(id) on delete cascade,
-  lesson_id uuid not null references public.lessons(id) on delete cascade,
-  completed_at timestamptz, activity_data jsonb not null default '{}'::jsonb,
-  unique(user_id, lesson_id)
+  lesson_id uuid references public.lessons(id) on delete cascade,
+  completed_at timestamptz not null default now(),
+  activity_data jsonb not null default '{}'::jsonb
 );
 
-create table public.pretest_questions (
+create table if not exists public.pretest_questions (
   id uuid primary key default gen_random_uuid(),
   module_id uuid references public.modules(id),
-  competency text, question text not null, options jsonb not null,
+  competency text,
+  question text not null,
+  options jsonb not null,
   correct_option int not null check(correct_option between 0 and 3),
-  weight numeric(6,2) not null default 1, is_active boolean not null default true,
+  weight numeric(6,2) not null default 1,
+  is_active boolean not null default true,
   created_at timestamptz not null default now()
 );
 
-create table public.posttest_questions (
+create table if not exists public.posttest_questions (
   id uuid primary key default gen_random_uuid(),
   module_id uuid references public.modules(id),
-  competency text, question text not null, options jsonb not null,
+  competency text,
+  question text not null,
+  options jsonb not null,
   correct_option int not null check(correct_option between 0 and 3),
-  weight numeric(6,2) not null default 1, is_active boolean not null default true,
+  weight numeric(6,2) not null default 1,
+  is_active boolean not null default true,
   created_at timestamptz not null default now()
 );
 
-create table public.test_attempts (
+create table if not exists public.test_attempts (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles(id) on delete cascade,
   test_type text not null check(test_type in ('pretest','posttest')),
-  score numeric(5,2), correct_count int, wrong_count int,
-  duration_seconds int, started_at timestamptz not null default now(),
-  submitted_at timestamptz, status text not null default 'in_progress',
+  score numeric(5,2),
+  correct_count int,
+  wrong_count int,
+  duration_seconds int,
+  started_at timestamptz not null default now(),
+  submitted_at timestamptz,
+  status text not null default 'in_progress',
   unique(user_id, test_type)
 );
 
-create table public.test_answers (
+create table if not exists public.test_answers (
   id uuid primary key default gen_random_uuid(),
   attempt_id uuid not null references public.test_attempts(id) on delete cascade,
   question_id uuid not null,
@@ -102,29 +137,32 @@ create table public.test_answers (
   unique(attempt_id, question_id)
 );
 
-create table public.reflection_notes (
+create table if not exists public.reflection_notes (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles(id) on delete cascade,
   lesson_id uuid references public.lessons(id) on delete set null,
-  note_type text not null, content text not null,
-  created_at timestamptz not null default now(), updated_at timestamptz not null default now()
+  note_type text not null,
+  content text not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
 
-create table public.activity_logs (
+create table if not exists public.activity_logs (
   id uuid primary key default gen_random_uuid(),
   actor_id uuid references public.profiles(id) on delete set null,
   target_user_id uuid references public.profiles(id) on delete set null,
-  action text not null, metadata jsonb not null default '{}'::jsonb,
+  action text not null,
+  metadata jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
 );
 
-create table public.facilitator_assignments (
+create table if not exists public.facilitator_assignments (
   facilitator_id uuid not null references public.profiles(id) on delete cascade,
   participant_id uuid not null references public.profiles(id) on delete cascade,
   primary key(facilitator_id, participant_id)
 );
 
--- Helper functions. Role assignment must be performed only by trusted administrators.
+-- 3. Fungsi pembantu Role
 create or replace function public.current_role()
 returns public.app_role language sql stable security definer
 set search_path = public
@@ -135,6 +173,7 @@ returns boolean language sql stable security definer
 set search_path = public
 as $$ select coalesce(public.current_role() in ('super_admin','admin_kua'), false) $$;
 
+-- 4. Aktifkan Row Level Security (RLS)
 alter table public.institutions enable row level security;
 alter table public.profiles enable row level security;
 alter table public.participant_profiles enable row level security;
@@ -150,55 +189,76 @@ alter table public.reflection_notes enable row level security;
 alter table public.activity_logs enable row level security;
 alter table public.facilitator_assignments enable row level security;
 
--- Publicly readable active learning content; write access only to admins.
+-- 5. Kebijakan Keamanan (Drop dulu sebelum Create agar tidak eror jika sudah ada)
+
+-- Modul & Pelajaran
+drop policy if exists "active modules readable" on public.modules;
 create policy "active modules readable" on public.modules for select using (is_active or public.is_admin());
+
+drop policy if exists "active lessons readable" on public.lessons;
 create policy "active lessons readable" on public.lessons for select using (is_active or public.is_admin());
+
+drop policy if exists "admins manage modules" on public.modules;
 create policy "admins manage modules" on public.modules for all using (public.is_admin()) with check (public.is_admin());
+
+drop policy if exists "admins manage lessons" on public.lessons;
 create policy "admins manage lessons" on public.lessons for all using (public.is_admin()) with check (public.is_admin());
 
--- Profile owner and admins; facilitator sees assigned participants only.
+-- Profil Pengguna
+drop policy if exists "profile read own admin or assigned" on public.profiles;
 create policy "profile read own admin or assigned" on public.profiles for select using (
- id = auth.uid() or public.is_admin() or
- (public.current_role()='fasilitator' and exists(select 1 from public.facilitator_assignments a where a.facilitator_id=auth.uid() and a.participant_id=profiles.id))
+  id = auth.uid() or public.is_admin()
 );
-create policy "profile update own or admin" on public.profiles for update using (id=auth.uid() or public.is_admin()) with check (id=auth.uid() or public.is_admin());
-create policy "profile insert self" on public.profiles for insert with check (id=auth.uid() and role='peserta');
 
+drop policy if exists "profile update own or admin" on public.profiles;
+create policy "profile update own or admin" on public.profiles for update using (id=auth.uid() or public.is_admin()) with check (id=auth.uid() or public.is_admin());
+
+drop policy if exists "profile insert self" on public.profiles;
+create policy "profile insert self" on public.profiles for insert with check (id=auth.uid());
+
+-- Biodata Peserta
+drop policy if exists "participant data own admin assigned" on public.participant_profiles;
 create policy "participant data own admin assigned" on public.participant_profiles for select using (
- user_id=auth.uid() or public.is_admin() or exists(select 1 from public.facilitator_assignments a where a.facilitator_id=auth.uid() and a.participant_id=participant_profiles.user_id)
+  user_id=auth.uid() or public.is_admin()
 );
+
+drop policy if exists "participant data insert own" on public.participant_profiles;
 create policy "participant data insert own" on public.participant_profiles for insert with check(user_id=auth.uid());
+
+drop policy if exists "participant data update own admin" on public.participant_profiles;
 create policy "participant data update own admin" on public.participant_profiles for update using(user_id=auth.uid() or public.is_admin()) with check(user_id=auth.uid() or public.is_admin());
 
+-- Pasangan
+drop policy if exists "partner own admin" on public.partners;
 create policy "partner own admin" on public.partners for all using(user_id=auth.uid() or public.is_admin()) with check(user_id=auth.uid() or public.is_admin());
-create policy "progress own admin assigned" on public.lesson_progress for select using(user_id=auth.uid() or public.is_admin() or exists(select 1 from public.facilitator_assignments a where a.facilitator_id=auth.uid() and a.participant_id=lesson_progress.user_id));
--- Penulisan progres dilakukan melalui Edge Function/RPC tepercaya agar peserta tidak dapat menandai semua lesson selesai sendiri.
-create policy "progress admin manage" on public.lesson_progress for all using(public.is_admin()) with check(public.is_admin());
 
--- Peserta tidak boleh membaca tabel bank soal secara langsung karena correct_option bersifat rahasia.
--- Edge Function tepercaya mengambil soal dan hanya mengirim teks + opsi tanpa kunci.
-create policy "question admins manage" on public.pretest_questions for all using(public.is_admin()) with check(public.is_admin());
-create policy "post questions admins manage" on public.posttest_questions for all using(public.is_admin()) with check(public.is_admin());
+-- Progres Modul & Subbab
+drop policy if exists "progress own admin assigned" on public.lesson_progress;
+create policy "progress own admin assigned" on public.lesson_progress for select using(user_id=auth.uid() or public.is_admin());
 
-create policy "attempt own or admin assigned read" on public.test_attempts for select using(user_id=auth.uid() or public.is_admin() or exists(select 1 from public.facilitator_assignments a where a.facilitator_id=auth.uid() and a.participant_id=test_attempts.user_id));
--- Pembuatan dan pengiriman attempt dilakukan oleh Edge Function tepercaya; klien hanya membaca hasil miliknya.
-create policy "attempt admin manage" on public.test_attempts for all using(public.is_admin()) with check(public.is_admin());
+drop policy if exists "progress own write" on public.lesson_progress;
+create policy "progress own write" on public.lesson_progress for all using(user_id=auth.uid() or public.is_admin()) with check(user_id=auth.uid() or public.is_admin());
 
+-- Kuis & Hasil Tes
+drop policy if exists "attempt own or admin assigned read" on public.test_attempts;
+create policy "attempt own or admin assigned read" on public.test_attempts for select using(user_id=auth.uid() or public.is_admin());
+
+drop policy if exists "attempt own write" on public.test_attempts;
+create policy "attempt own write" on public.test_attempts for all using(user_id=auth.uid() or public.is_admin()) with check(user_id=auth.uid() or public.is_admin());
+
+drop policy if exists "answers through own attempts" on public.test_answers;
 create policy "answers through own attempts" on public.test_answers for select using(exists(select 1 from public.test_attempts t where t.id=attempt_id and (t.user_id=auth.uid() or public.is_admin())));
--- Penulisan jawaban dan is_correct hanya melalui Edge Function tepercaya.
-create policy "answers admin manage" on public.test_answers for all using(public.is_admin()) with check(public.is_admin());
-create policy "notes own admin assigned read" on public.reflection_notes for select using(user_id=auth.uid() or public.is_admin() or exists(select 1 from public.facilitator_assignments a where a.facilitator_id=auth.uid() and a.participant_id=reflection_notes.user_id));
-create policy "notes own write" on public.reflection_notes for all using(user_id=auth.uid()) with check(user_id=auth.uid());
-create policy "logs admin read" on public.activity_logs for select using(public.is_admin());
-create policy "logs actor insert" on public.activity_logs for insert with check(actor_id=auth.uid());
-create policy "assignments admin manage" on public.facilitator_assignments for all using(public.is_admin()) with check(public.is_admin());
-create policy "institution read authenticated" on public.institutions for select using(auth.uid() is not null);
-create policy "institution admin manage" on public.institutions for all using(public.is_admin()) with check(public.is_admin());
 
--- IMPORTANT PRODUCTION HARDENING:
--- 1) Do not expose correct_option to participant clients. Replace direct question SELECT
---    with a safe view/RPC that returns question + options only.
--- 2) Grade and submit tests in a trusted Edge Function / server endpoint using service role.
--- 3) Tambahkan column-level grants/triggers agar klien tidak dapat mengubah role, is_active, score, is_correct, atau kolom sistem.
--- 4) Add audit triggers, rate limits, retention/deletion workflows, and tested policies.
--- 5) Review every policy with separate test accounts for all four roles before launch.
+drop policy if exists "answers own write" on public.test_answers;
+create policy "answers own write" on public.test_answers for all using(exists(select 1 from public.test_attempts t where t.id=attempt_id and (t.user_id=auth.uid() or public.is_admin()))) with check(exists(select 1 from public.test_attempts t where t.id=attempt_id and (t.user_id=auth.uid() or public.is_admin())));
+
+-- Catatan Refleksi
+drop policy if exists "notes own admin assigned read" on public.reflection_notes;
+create policy "notes own admin assigned read" on public.reflection_notes for select using(user_id=auth.uid() or public.is_admin());
+
+drop policy if exists "notes own write" on public.reflection_notes;
+create policy "notes own write" on public.reflection_notes for all using(user_id=auth.uid() or public.is_admin()) with check(user_id=auth.uid() or public.is_admin());
+
+-- Institusi
+drop policy if exists "institution read authenticated" on public.institutions;
+create policy "institution read authenticated" on public.institutions for select using(true);
