@@ -12,6 +12,25 @@ begin
 end $$;
 
 -- 2. Buat tabel-tabel utama
+create table if not exists public.app_users (
+  id text primary key,
+  phone text unique not null,
+  name text not null,
+  email text,
+  gender text,
+  password_hash text not null,
+  profile jsonb default '{}'::jsonb,
+  progress jsonb default '{"1":[],"2":[]}'::jsonb,
+  pre jsonb,
+  post jsonb,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+alter table public.app_users enable row level security;
+drop policy if exists "allow all for app_users" on public.app_users;
+create policy "allow all for app_users" on public.app_users for all using (true) with check (true);
+
 create table if not exists public.institutions (
   id uuid primary key default gen_random_uuid(),
   name text not null default 'KUA Kecamatan Makale',

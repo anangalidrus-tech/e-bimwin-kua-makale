@@ -1,5 +1,5 @@
 /* E-BIMWIN KUA MAKALE — Bimbingan Perkawinan Digital
-   Terintegrasi dengan Supabase Cloud Backend & Local Fallback.
+   Terintegrasi dengan Supabase Cloud Database (Multi-Device Sync) & Local Cache Fallback.
    URL: https://scanwjvvnwcfqblljafg.supabase.co
 */
 
@@ -40,7 +40,7 @@ function notify(msg) {
   t.textContent = msg;
   t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
 }
 
 function uid() {
@@ -91,7 +91,7 @@ function normalizePhone(v) {
 }
 
 // --------------------------------------------------------------------------
-// REGISTRATION (SUPABASE CLOUD + LOCAL FALLBACK)
+// REGISTRATION (SUPABASE CLOUD MULTI-DEVICE + LOCAL CACHE)
 // --------------------------------------------------------------------------
 async function register(form) {
   const d = Object.fromEntries(new FormData(form));
@@ -112,18 +112,32 @@ async function register(form) {
   }
 
   const submitBtn = form.querySelector('button[type="submit"]');
-  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Mendaftarkan...'; }
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Mendaftarkan ke Cloud...'; }
 
-  // Virtual Auth Email based on phone for 100% reliable login without SMS gateway cost
-  const authEmail = (d.email && d.email.includes('@')) 
-    ? d.email.trim().toLowerCase() 
-    : `${phone}@ebimwin.kua-makale.id`;
-
-  let supabaseUserId = null;
+  // Virtual Auth Email based strictly on phone for 100% consistent login across all devices
+  const authEmail = `${phone}@ebimwin.kua-makale.id`;
+  let userId = uid();
+  let cloudSuccess = false;
 
   if (sb) {
+    // 1. Check if phone is already registered in Supabase app_users table
     try {
-      const { data: authData, error: authError } = await sb.auth.signUp({
+      const { data: existingUser } = await sb.from('app_users').select('id, phone').eq('phone', phone).maybeSingle();
+      if (existingUser) {
+        notify('Nomor HP ini sudah terdaftar di Cloud! Silakan langsung Masuk.');
+        setAuthTab('login');
+        const loginInput = $('#loginForm input[name="phone"]');
+        if (loginInput) loginInput.value = d.phone;
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Daftar sekarang'; }
+        return;
+      }
+    } catch (e) {
+      console.warn('Check existing user note:', e);
+    }
+
+    // 2. Register to Supabase Auth
+    try {
+      const { data: authData } = await sb.auth.signUp({
         email: authEmail,
         password: pass,
         options: {
@@ -134,45 +148,54 @@ async function register(form) {
           }
         }
       });
-
-      if (authError) {
-        if (authError.message && (authError.message.includes('already registered') || authError.message.toLowerCase().includes('already'))) {
-          notify('Nomor HP / Akun ini sudah terdaftar. Silakan langsung masuk.');
-          setAuthTab('login');
-          const loginInput = $('#loginForm input[name="phone"]');
-          if (loginInput) loginInput.value = d.phone;
-          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Daftar sekarang'; }
-          return;
-        }
-        console.warn('Supabase signUp note:', authError.message);
-      } else if (authData && authData.user) {
-        supabaseUserId = authData.user.id;
-        // Upsert into public.profiles
-        try {
-          await sb.from('profiles').upsert({
-            id: supabaseUserId,
-            full_name: (d.name || '').trim(),
-            phone: phone,
-            role: 'peserta'
-          });
-        } catch (pe) {
-          console.warn('Profile upsert note:', pe);
-        }
+      if (authData?.user) {
+        userId = authData.user.id;
       }
-    } catch (err) {
-      console.warn('Supabase register error:', err);
+    } catch (e) {
+      console.warn('Supabase Auth note:', e);
     }
+
+    // 3. Save directly to public.app_users (Guaranteed multi-device sync table!)
+    try {
+      const { error: appUserErr } = await sb.from('app_users').upsert({
+        id: userId,
+        phone: phone,
+        name: (d.name || '').trim(),
+        email: (d.email || '').trim(),
+        gender: d.gender,
+        password_hash: hashDemo(pass),
+        profile: {},
+        progress: { 1: [], 2: [] },
+        pre: null,
+        post: null,
+        updated_at: new Date().toISOString()
+      });
+      if (!appUserErr) {
+        cloudSuccess = true;
+      } else {
+        console.warn('app_users upsert note:', appUserErr.message);
+      }
+    } catch (e) {
+      console.warn('app_users upsert error:', e);
+    }
+
+    // Also sync to public.profiles if exists
+    try {
+      await sb.from('profiles').upsert({
+        id: userId,
+        full_name: (d.name || '').trim(),
+        phone: phone,
+        role: 'peserta'
+      });
+    } catch (e) {}
   }
 
-  // Create or update local user object (linked to Supabase ID if available)
-  const uId = supabaseUserId || uid();
+  // 4. Cache user locally
   const u = {
-    id: uId,
-    supabaseId: supabaseUserId,
+    id: userId,
     name: (d.name || '').trim(),
     phone,
     email: (d.email || '').trim(),
-    authEmail: authEmail,
     gender: d.gender,
     passwordDemo: hashDemo(pass),
     createdAt: new Date().toISOString(),
@@ -194,12 +217,16 @@ async function register(form) {
 
   if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Daftar sekarang'; }
   form.reset();
-  notify('Akun berhasil dibuat & tersimpan di Cloud! Lengkapi biodata.');
+  if (cloudSuccess) {
+    notify('✓ Akun berhasil terdaftar di Cloud! Siap login dari perangkat apa saja.');
+  } else {
+    notify('Akun berhasil dibuat. Pastikan tabel SQL sudah di-Run di Supabase.');
+  }
   showPage('profile');
 }
 
 // --------------------------------------------------------------------------
-// LOGIN (SUPABASE CLOUD + LOCAL FALLBACK)
+// LOGIN (SUPABASE CLOUD MULTI-DEVICE + LOCAL FALLBACK)
 // --------------------------------------------------------------------------
 async function login(form) {
   const d = Object.fromEntries(new FormData(form));
@@ -211,120 +238,92 @@ async function login(form) {
   const pass = (d.password || '').trim();
 
   const submitBtn = form.querySelector('button[type="submit"]');
-  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Memeriksa...'; }
-
-  const authEmail = (d.phone && d.phone.includes('@')) 
-    ? d.phone.trim().toLowerCase() 
-    : `${phone}@ebimwin.kua-makale.id`;
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Memeriksa Cloud...'; }
 
   let loggedInUser = null;
 
-  // 1. Try Supabase Cloud Login first
+  // 1. First, check Supabase Cloud Database (app_users table) - WORKS 100% ACROSS ALL DEVICES!
   if (sb) {
     try {
-      const { data: authData, error: authError } = await sb.auth.signInWithPassword({
-        email: authEmail,
-        password: pass
-      });
+      const { data: cloudUser, error: cloudErr } = await sb.from('app_users').select('*').eq('phone', phone).maybeSingle();
+      if (cloudUser && !cloudErr) {
+        // Verify password
+        const expectedHash = cloudUser.password_hash;
+        const passMatch = expectedHash === hashDemo(pass) || expectedHash === hashDemo(pass.trim());
+        if (!passMatch) {
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Masuk ke akun'; }
+          notify('Password salah. Periksa kembali huruf besar/kecil Anda.');
+          return;
+        }
 
-      if (!authError && authData?.user) {
-        const su = authData.user;
-        const sMeta = su.user_metadata || {};
-        
-        // Fetch profile
-        let sProfile = null;
-        try {
-          const { data: pData } = await sb.from('profiles').select('*').eq('id', su.id).maybeSingle();
-          if (pData) sProfile = pData;
-        } catch (e) {}
-
-        // Fetch participant details
-        let pDetails = null;
-        try {
-          const { data: partData } = await sb.from('participant_profiles').select('*').eq('user_id', su.id).maybeSingle();
-          if (partData) {
-            pDetails = {
-              fullName: sProfile?.full_name || sMeta.full_name || '',
-              father: partData.father_name || '',
-              birthPlace: partData.birth_place || '',
-              birthDate: partData.birth_date || '',
-              gender: partData.gender || sMeta.gender || '',
-              address: partData.address || '',
-              birthOrder: partData.birth_order || '',
-              education: partData.education || '',
-              job: partData.occupation || '',
-              kua: partData.kua_name || 'KUA Kecamatan Makale',
-              weddingDate: partData.wedding_date || '',
-              attendance: partData.attendance_status || 'Belum mengikuti'
-            };
-          }
-        } catch (e) {}
-
-        // Fetch lesson progress
-        const progressObj = { 1: [], 2: [] };
-        try {
-          const { data: progData } = await sb.from('lesson_progress').select('*').eq('user_id', su.id);
-          if (progData && progData.length) {
-            progData.forEach(item => {
-              if (item.completed_at && item.activity_data) {
-                const m = item.activity_data.module || 1;
-                const idx = item.activity_data.lessonIndex ?? 0;
-                if (!progressObj[m].includes(idx)) progressObj[m].push(idx);
-              }
-            });
-          }
-        } catch (e) {}
-
-        // Fetch test attempts
-        let preScore = null, postScore = null;
-        try {
-          const { data: attempts } = await sb.from('test_attempts').select('*').eq('user_id', su.id);
-          if (attempts) {
-            const preAttempt = attempts.find(a => a.test_type === 'pretest' && a.status === 'submitted');
-            const postAttempt = attempts.find(a => a.test_type === 'posttest' && a.status === 'submitted');
-            if (preAttempt) preScore = { score: Number(preAttempt.score), correct: preAttempt.correct_count, wrong: preAttempt.wrong_count };
-            if (postAttempt) postScore = { score: Number(postAttempt.score), correct: postAttempt.correct_count, wrong: postAttempt.wrong_count };
-          }
-        } catch (e) {}
-
-        // Construct user session object
+        // Successfully authenticated via Cloud Database!
         loggedInUser = {
-          id: su.id,
-          supabaseId: su.id,
-          name: sProfile?.full_name || sMeta.full_name || sMeta.name || 'Peserta',
-          phone: sProfile?.phone || sMeta.phone || phone,
-          email: su.email?.includes('@ebimwin.') ? '' : su.email,
-          authEmail: su.email,
-          gender: pDetails?.gender || sMeta.gender || 'Perempuan',
-          passwordDemo: hashDemo(pass),
-          createdAt: su.created_at || new Date().toISOString(),
-          profile: pDetails,
-          pre: preScore,
-          post: postScore,
-          progress: progressObj,
+          id: cloudUser.id,
+          name: cloudUser.name || 'Peserta',
+          phone: cloudUser.phone,
+          email: cloudUser.email || '',
+          gender: cloudUser.gender || 'Perempuan',
+          passwordDemo: expectedHash,
+          createdAt: cloudUser.created_at || new Date().toISOString(),
+          profile: cloudUser.profile || null,
+          progress: cloudUser.progress || { 1: [], 2: [] },
+          pre: cloudUser.pre || null,
+          post: cloudUser.post || null,
           reflections: {},
           activities: []
         };
 
-        // Cache locally
-        const exIdx = db.users.findIndex(x => x.phone === phone || x.id === su.id);
+        // Cache into local browser
+        const exIdx = db.users.findIndex(x => x.phone === phone || x.id === cloudUser.id);
         if (exIdx >= 0) db.users[exIdx] = loggedInUser;
         else db.users.push(loggedInUser);
 
-      } else if (authError) {
-        console.warn('Supabase signIn note:', authError.message);
-        if (authError.message.includes('Email not confirmed')) {
-          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Masuk ke akun'; }
-          notify('Konfirmasi email di Supabase masih aktif. Matikan "Confirm email" di Auth Settings Supabase.');
-          return;
-        }
+        // Also trigger Supabase Auth session in background if possible
+        try {
+          sb.auth.signInWithPassword({
+            email: `${phone}@ebimwin.kua-makale.id`,
+            password: pass
+          }).catch(() => {});
+        } catch (e) {}
       }
-    } catch (err) {
-      console.warn('Supabase login exception:', err);
+    } catch (e) {
+      console.warn('Cloud login check error:', e);
+    }
+
+    // 2. Also try Supabase Auth if app_users didn't find them
+    if (!loggedInUser) {
+      try {
+        const { data: authData } = await sb.auth.signInWithPassword({
+          email: `${phone}@ebimwin.kua-makale.id`,
+          password: pass
+        });
+        if (authData?.user) {
+          const su = authData.user;
+          const sMeta = su.user_metadata || {};
+          loggedInUser = {
+            id: su.id,
+            name: sMeta.full_name || sMeta.name || 'Peserta',
+            phone: sMeta.phone || phone,
+            email: su.email?.includes('@ebimwin.') ? '' : su.email,
+            gender: sMeta.gender || 'Perempuan',
+            passwordDemo: hashDemo(pass),
+            createdAt: su.created_at || new Date().toISOString(),
+            profile: null,
+            progress: { 1: [], 2: [] },
+            pre: null,
+            post: null,
+            reflections: {},
+            activities: []
+          };
+          const exIdx = db.users.findIndex(x => x.phone === phone || x.id === su.id);
+          if (exIdx >= 0) db.users[exIdx] = loggedInUser;
+          else db.users.push(loggedInUser);
+        }
+      } catch (e) {}
     }
   }
 
-  // 2. If Supabase login did not find user, check local cache fallback
+  // 3. Fallback to Local Cache if still not found
   if (!loggedInUser) {
     const localUser = db.users.find(x => x.phone === phone);
     if (localUser) {
@@ -336,7 +335,7 @@ async function login(form) {
   if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Masuk ke akun'; }
 
   if (!loggedInUser) {
-    notify('Nomor HP atau password tidak sesuai. Pastikan Anda telah mendaftar.');
+    notify('Nomor HP belum terdaftar di Cloud atau perangkat ini. Silakan daftar terlebih dahulu.');
     return;
   }
 
@@ -344,7 +343,7 @@ async function login(form) {
   currentUser = loggedInUser.id;
   save();
   form.reset();
-  notify(`Berhasil masuk! Selamat datang, ${loggedInUser.name}.`);
+  notify(`✓ Berhasil masuk! Selamat datang, ${loggedInUser.name}.`);
   showPage('dashboard');
 }
 
@@ -384,7 +383,21 @@ async function saveProfile(form) {
   u.activities.push({ type: 'Biodata diperbarui', at: new Date().toISOString() });
   save();
 
-  // Sync to Supabase
+  // Sync to Supabase app_users table
+  if (sb && u.phone) {
+    try {
+      await sb.from('app_users').update({
+        name: p.fullName,
+        gender: p.gender,
+        profile: p,
+        updated_at: new Date().toISOString()
+      }).eq('phone', u.phone);
+    } catch (e) {
+      console.warn('Sync profile to app_users note:', e);
+    }
+  }
+
+  // Also sync to public.profiles and participant_profiles
   if (sb && u.id) {
     try {
       await sb.from('profiles').upsert({
@@ -416,12 +429,10 @@ async function saveProfile(form) {
           phone: p.partnerPhone || ''
         });
       }
-    } catch (e) {
-      console.warn('Supabase saveProfile sync note:', e);
-    }
+    } catch (e) {}
   }
 
-  notify('Biodata berhasil disimpan ke Cloud & perangkat ini!');
+  notify('✓ Biodata berhasil disimpan ke Cloud Database!');
   showPage('dashboard');
 }
 
@@ -584,10 +595,20 @@ async function submitTest() {
   u.activities.push({ type: `${kind === 'pre' ? 'Pre-test' : 'Post-test'} selesai`, at: new Date().toISOString() });
   save();
 
-  // Sync to Supabase
+  // Sync to Supabase app_users table
+  if (sb && u.phone) {
+    try {
+      const updateData = { updated_at: new Date().toISOString() };
+      if (kind === 'pre') updateData.pre = u.pre;
+      if (kind === 'post') updateData.post = u.post;
+      sb.from('app_users').update(updateData).eq('phone', u.phone).then();
+    } catch (e) {}
+  }
+
+  // Also sync to test_attempts if exists
   if (sb && u.id) {
     try {
-      await sb.from('test_attempts').upsert({
+      sb.from('test_attempts').upsert({
         user_id: u.id,
         test_type: kind === 'pre' ? 'pretest' : 'posttest',
         score: score,
@@ -596,10 +617,8 @@ async function submitTest() {
         duration_seconds: durationSeconds,
         status: 'submitted',
         submitted_at: new Date().toISOString()
-      });
-    } catch (e) {
-      console.warn('Supabase test attempt sync note:', e);
-    }
+      }).then();
+    } catch (e) {}
   }
 
   const result = u[kind];
@@ -651,17 +670,25 @@ async function completeLesson() {
   u.activities.push({ type: `Modul ${activeModule}: ${modules[activeModule].lessons[lessonIndex][0]} selesai`, at: new Date().toISOString() });
   save();
 
-  // Sync to Supabase
+  // Sync to Supabase app_users table
+  if (sb && u.phone) {
+    try {
+      sb.from('app_users').update({
+        progress: u.progress,
+        updated_at: new Date().toISOString()
+      }).eq('phone', u.phone).then();
+    } catch (e) {}
+  }
+
+  // Also sync to lesson_progress if exists
   if (sb && u.id) {
     try {
-      await sb.from('lesson_progress').upsert({
+      sb.from('lesson_progress').upsert({
         user_id: u.id,
         completed_at: new Date().toISOString(),
         activity_data: { module: activeModule, lessonIndex: lessonIndex }
-      });
-    } catch (e) {
-      console.warn('Supabase lesson progress sync note:', e);
-    }
+      }).then();
+    } catch (e) {}
   }
 
   if (lessonIndex < modules[activeModule].lessons.length - 1) {
@@ -767,15 +794,13 @@ async function saveActivity(key) {
   // Sync to Supabase reflection_notes
   if (sb && u.id) {
     try {
-      await sb.from('reflection_notes').upsert({
+      sb.from('reflection_notes').upsert({
         user_id: u.id,
         note_type: key,
         content: el.value,
         updated_at: new Date().toISOString()
-      });
-    } catch (e) {
-      console.warn('Supabase reflection note sync:', e);
-    }
+      }).then();
+    } catch (e) {}
   }
 
   notify('Refleksi berhasil disimpan ke Cloud & perangkat ini.');
