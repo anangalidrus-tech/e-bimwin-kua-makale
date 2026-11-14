@@ -54,7 +54,7 @@
         </div>
         <div class="trust-row">
           <span><span class="trust-check">✓</span> Belajar mandiri</span>
-          <span><span class="trust-check">✓</span> Dua modul utama</span>
+          <span><span class="trust-check">✓</span> Lima modul lengkap</span>
           <span><span class="trust-check">✓</span> Evaluasi pembelajaran</span>
         </div>
       </div>
@@ -94,7 +94,7 @@
       <div class="steps">
         <article><span>01</span><b>Daftar & Biodata</b><p>Buat akun dan lengkapi identitas calon pengantin.</p></article>
         <article><span>02</span><b>Pre-test</b><p>Kenali pengetahuan awal sebelum belajar.</p></article>
-        <article><span>03</span><b>Dua Modul</b><p>Pelajari keluarga sakinah dan psikologi keluarga.</p></article>
+        <article><span>03</span><b>Lima Modul</b><p>Pelajari keluarga sakinah, psikologi, kebutuhan finansial, reproduksi, dan generasi berkualitas.</p></article>
         <article><span>04</span><b>Post-test</b><p>Ukur perkembangan pengetahuan Anda.</p></article>
       </div>
       <div class="callout">
@@ -162,10 +162,13 @@
       <div class="dash-grid">
         <article class="dash-card"><span class="card-icon">01</span><h3>Data diri</h3><p id="profileStatus">Belum dilengkapi</p><button class="text-button" data-route="profile">Lengkapi biodata →</button></article>
         <article class="dash-card"><span class="card-icon">02</span><h3>Pre-test</h3><p id="preStatus">Belum dikerjakan</p><button class="text-button" data-action="pretest">Mulai pre-test →</button></article>
-        <article class="dash-card"><span class="card-icon">03</span><h3>Modul 1</h3><p id="m1Status">0 dari 4 subbab</p><button class="text-button" data-action="module" data-module="1">Buka modul →</button></article>
-        <article class="dash-card"><span class="card-icon">04</span><h3>Modul 2</h3><p id="m2Status">0 dari 7 subbab</p><button class="text-button" data-action="module" data-module="2">Buka modul →</button></article>
-        <article class="dash-card"><span class="card-icon">05</span><h3>Post-test</h3><p id="postStatus">Menunggu penyelesaian modul</p><button class="text-button" data-action="posttest">Buka post-test →</button></article>
-        <article class="dash-card"><span class="card-icon">06</span><h3>Hasil belajar</h3><p id="resultStatus">Belum tersedia</p><button class="text-button" data-route="results">Lihat hasil →</button></article>
+        <article class="dash-card"><span class="card-icon">03</span><h3>Modul 1</h3><p class="dash-sub">Keluarga Sakinah</p><p id="m1Status">0 dari 3 subbab</p><button class="text-button" data-action="module" data-module="1">Buka modul →</button></article>
+        <article class="dash-card"><span class="card-icon">04</span><h3>Modul 2</h3><p class="dash-sub">Psikologi Keluarga</p><p id="m2Status">0 dari 3 subbab</p><button class="text-button" data-action="module" data-module="2">Buka modul →</button></article>
+        <article class="dash-card"><span class="card-icon">05</span><h3>Modul 3</h3><p class="dash-sub">Kebutuhan Keluarga</p><p id="m3Status">0 dari 3 subbab</p><button class="text-button" data-action="module" data-module="3">Buka modul →</button></article>
+        <article class="dash-card"><span class="card-icon">06</span><h3>Modul 4</h3><p class="dash-sub">Kesehatan Reproduksi</p><p id="m4Status">0 dari 3 subbab</p><button class="text-button" data-action="module" data-module="4">Buka modul →</button></article>
+        <article class="dash-card"><span class="card-icon">07</span><h3>Modul 5</h3><p class="dash-sub">Generasi Berkualitas</p><p id="m5Status">0 dari 3 subbab</p><button class="text-button" data-action="module" data-module="5">Buka modul →</button></article>
+        <article class="dash-card"><span class="card-icon">08</span><h3>Post-test</h3><p id="postStatus">Menunggu penyelesaian modul</p><button class="text-button" data-action="posttest">Buka post-test →</button></article>
+        <article class="dash-card"><span class="card-icon">09</span><h3>Hasil belajar</h3><p id="resultStatus">Belum tersedia</p><button class="text-button" data-route="results">Lihat hasil →</button></article>
       </div>
       <div class="dash-bottom">
         <div>
@@ -212,6 +215,13 @@
       </div>
       <div class="module-layout">
         <aside class="lesson-nav">
+          <div class="module-selector-tabs" id="moduleTabs">
+            <button class="mod-tab active" data-switch-module="1" title="Modul 1: Membangun Keluarga Sakinah">Modul 1</button>
+            <button class="mod-tab" data-switch-module="2" title="Modul 2: Psikologi Keluarga">Modul 2</button>
+            <button class="mod-tab" data-switch-module="3" title="Modul 3: Memenuhi Kebutuhan Keluarga">Modul 3</button>
+            <button class="mod-tab" data-switch-module="4" title="Modul 4: Menjaga Kesehatan Reproduksi Keluarga">Modul 4</button>
+            <button class="mod-tab" data-switch-module="5" title="Modul 5: Menyiapkan Generasi Berkualitas">Modul 5</button>
+          </div>
           <h3 id="moduleNavTitle">Daftar subbab</h3>
           <div id="lessonList"></div>
           <div class="mini-progress">

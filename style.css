@@ -2311,3 +2311,909 @@ footer small {
     box-shadow: none;
   }
 }
+
+
+
+/* ==========================================================================
+   E-BIMWIN KUA MAKALE — 5 MODULES & INTERACTIVE TOOLS STYLES
+   Minimalism + Aurora Theme
+   ========================================================================== */
+
+/* Subtitle under dash card title */
+.dash-sub {
+  font-size: 0.82rem;
+  color: var(--aurora-cyan);
+  margin: -4px 0 6px 0;
+  font-weight: 600;
+}
+
+/* Module Selector Tabs in Lesson Sidebar */
+.module-selector-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.mod-tab {
+  flex: 1;
+  min-width: 54px;
+  padding: 6px 8px;
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  text-align: center;
+}
+.mod-tab:hover {
+  background: rgba(6, 182, 212, 0.1);
+  color: var(--text-primary);
+  border-color: var(--border-aurora);
+}
+.mod-tab.active {
+  background: var(--grad-aurora);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.35);
+}
+
+/* Dalil and Arabic Calligraphy Display */
+.dalil-card {
+  background: var(--bg-surface-subtle);
+  border-left: 3px solid var(--aurora-cyan);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 18px 0;
+  backdrop-filter: blur(10px);
+}
+.arabic-text {
+  font-size: 1.35rem;
+  line-height: 2.2rem;
+  direction: rtl;
+  text-align: right;
+  font-family: 'Amiri', 'Traditional Arabic', serif;
+  color: #fbbf24;
+  margin-bottom: 8px;
+}
+.translation {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Info Callout */
+.info-callout {
+  background: rgba(6, 182, 212, 0.08);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin: 16px 0;
+}
+.info-callout p {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+}
+
+/* Tepuk Sakinah Card */
+.tepuk-sakinah-card {
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px dashed rgba(251, 191, 36, 0.35);
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin: 20px 0;
+}
+.tepuk-sakinah-card h4 {
+  color: var(--aurora-gold);
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+.tepuk-sakinah-card pre {
+  margin: 0;
+  font-family: inherit;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+/* Tool Container Card */
+.tool-box {
+  margin-top: 32px;
+  padding: 24px;
+  border-radius: 20px;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-highlight);
+  box-shadow: var(--shadow-card);
+  position: relative;
+  overflow: hidden;
+}
+.tool-box::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  background: var(--grad-aurora);
+}
+.tool-head {
+  margin-bottom: 20px;
+}
+.tool-head h3 {
+  margin: 8px 0 4px 0;
+  font-size: 1.35rem;
+}
+.tool-badge {
+  display: inline-block;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(6, 182, 212, 0.15);
+  color: var(--aurora-cyan);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
+/* ==========================================================================
+   MODUL 1: SUNGAI KEHIDUPAN
+   ========================================================================== */
+.river-container {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.river-header-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: var(--bg-surface-subtle);
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+}
+.river-title-tag {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--aurora-cyan);
+  letter-spacing: 0.08em;
+}
+.river-name-tag {
+  font-size: 0.95rem;
+  color: var(--aurora-gold);
+}
+.river-svg-wrap {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(7, 11, 20, 0.5);
+  box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+  margin: 10px 0;
+}
+.river-svg {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0; left: 0;
+}
+.river-stone {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  background: rgba(15, 23, 42, 0.85);
+  border: 2px solid #38bdf8;
+  box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+  border-radius: 12px;
+  padding: 8px 12px;
+  text-align: center;
+  min-width: 85px;
+  backdrop-filter: blur(8px);
+  z-index: 2;
+}
+.river-stone.stone-1 { left: 15%; top: 45%; border-color: #fbbf24; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4); }
+.river-stone.stone-2 { left: 50%; top: 45%; border-color: #10b981; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); }
+.river-stone.stone-3 { left: 85%; top: 45%; border-color: #8b5cf6; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4); }
+
+.stone-num {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+.stone-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.stone-val {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  margin-top: 2px;
+}
+.river-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.river-form-grid .span-all {
+  grid-column: 1 / -1;
+}
+.highlight-card {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 14px;
+  padding: 16px;
+}
+.calc-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+}
+.calc-box strong {
+  font-size: 1.6rem;
+  color: var(--aurora-emerald);
+}
+.form-group-river {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.form-group-river.middle-river {
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 18px;
+}
+.form-group-river h4 {
+  margin: 0 0 8px 0;
+  color: var(--aurora-sky);
+  font-size: 1rem;
+}
+
+/* ==========================================================================
+   MODUL 1: PERAGA BANGUNAN KELUARGA SAKINAH
+   ========================================================================== */
+.house-interactive-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.sakinah-house {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  padding: 24px 20px;
+}
+.house-roof {
+  width: 90%;
+  max-width: 520px;
+  background: linear-gradient(180deg, rgba(6, 182, 212, 0.25) 0%, rgba(99, 102, 241, 0.25) 100%);
+  border: 2px solid var(--border-aurora);
+  border-radius: 18px 18px 4px 4px;
+  padding: 18px 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 8px 24px rgba(6, 182, 212, 0.2);
+}
+.house-roof:hover {
+  transform: translateY(-2px);
+  border-color: #38bdf8;
+  box-shadow: 0 12px 30px rgba(6, 182, 212, 0.35);
+}
+.roof-caption b {
+  display: block;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  letter-spacing: 0.05em;
+}
+.roof-caption small {
+  font-size: 0.78rem;
+  color: var(--aurora-cyan);
+}
+.house-pillars {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  width: 90%;
+  max-width: 520px;
+  margin: 10px 0;
+}
+.pillar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.pillar:hover {
+  transform: translateY(-3px);
+}
+.pillar-cap, .pillar-base {
+  width: 90%;
+  height: 6px;
+  background: var(--aurora-sky);
+  border-radius: 3px;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+}
+.pillar-shaft {
+  width: 80%;
+  height: 95px;
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.15), rgba(99, 102, 241, 0.15));
+  border-left: 1px solid var(--border-aurora);
+  border-right: 1px solid var(--border-aurora);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  text-align: center;
+}
+.pillar-shaft span {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--aurora-sky);
+  letter-spacing: 0.04em;
+}
+.pillar-shaft small {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  line-height: 1.1;
+  margin-top: 2px;
+}
+.house-foundations {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 90%;
+  max-width: 520px;
+}
+.foundation-block {
+  background: linear-gradient(180deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.25));
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  border-radius: 8px;
+  padding: 12px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-size: 0.78rem;
+  color: #fbbf24;
+}
+.foundation-block:hover {
+  transform: translateY(-2px);
+  border-color: #fbbf24;
+  box-shadow: 0 6px 18px rgba(251, 191, 36, 0.3);
+}
+
+.house-detail-box {
+  min-height: 90px;
+}
+.detail-placeholder {
+  padding: 16px;
+  text-align: center;
+  border: 1px dashed var(--border-subtle);
+  border-radius: 12px;
+  color: var(--text-dim);
+  font-size: 0.88rem;
+}
+.house-detail-card {
+  background: rgba(6, 182, 212, 0.08);
+  border: 1px solid var(--border-aurora);
+  border-radius: 14px;
+  padding: 18px 22px;
+  animation: fadeIn 0.3s ease;
+}
+.house-detail-card h4 {
+  margin: 0 0 8px 0;
+  color: var(--aurora-cyan);
+  font-size: 1.1rem;
+}
+.house-detail-card p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   IKRAR PERKAWINAN CARD
+   ========================================================================== */
+.pledge-card-wrap {
+  border-color: rgba(251, 191, 36, 0.4);
+  background: linear-gradient(180deg, rgba(251, 191, 36, 0.06) 0%, rgba(15, 23, 42, 0.7) 100%);
+}
+.pledge-title {
+  color: #fbbf24;
+  letter-spacing: 0.1em;
+  margin: 6px 0;
+  font-size: 1.6rem;
+}
+.arabic-sub {
+  font-family: 'Amiri', serif;
+  font-size: 1.25rem;
+  color: #fde68a;
+  margin: 4px 0;
+  direction: rtl;
+}
+.pledge-lead {
+  display: block;
+  margin-top: 10px;
+  color: #fef08a;
+  letter-spacing: 0.08em;
+}
+.pledge-points {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 20px 0;
+}
+.pledge-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-radius: 12px;
+  padding: 12px 18px;
+}
+.pledge-item span {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+.pledge-item p {
+  margin: 0;
+  font-size: 0.94rem;
+  color: var(--text-primary);
+}
+.pledge-action-area {
+  margin-top: 24px;
+}
+.pledge-stamp {
+  border: 2px solid #10b981;
+  background: rgba(16, 185, 129, 0.12);
+  border-radius: 16px;
+  padding: 18px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  animation: pulseGlow 2s infinite;
+}
+.stamp-icon {
+  font-size: 2rem;
+  color: #10b981;
+}
+.pledge-stamp b {
+  font-size: 1.15rem;
+  color: #34d399;
+  letter-spacing: 0.06em;
+}
+.pulse-glow {
+  box-shadow: 0 0 25px rgba(251, 191, 36, 0.4);
+}
+
+/* ==========================================================================
+   MODUL 2: BAHAN BAKAR CINTA, REKENING BANK & KASUS
+   ========================================================================== */
+.love-language-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.love-card {
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 14px;
+}
+.love-card b {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--aurora-sky);
+  margin-bottom: 4px;
+}
+.love-card small {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+.form-grid-love {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.form-grid-love .span-all {
+  grid-column: 1 / -1;
+}
+
+.bank-4-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.bank-cell {
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.bank-cell-head.positive b { color: #34d399; }
+.bank-cell-head.negative b { color: #f87171; }
+.bank-cell-head small {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.case-study-box {
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 20px;
+}
+.case-study-box h4 {
+  color: #f87171;
+  margin: 0 0 10px 0;
+  font-size: 0.98rem;
+}
+.case-text-scroll {
+  max-height: 190px;
+  overflow-y: auto;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  padding-right: 8px;
+}
+.case-analysis-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ==========================================================================
+   MODUL 3: KEBUTUHAN & KEUANGAN
+   ========================================================================== */
+.needs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+.need-box {
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.need-box h4 {
+  margin: 0;
+  color: var(--aurora-cyan);
+  font-size: 1rem;
+}
+.priorities-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px 0;
+}
+.priorities-list label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  color: var(--aurora-sky);
+}
+.priorities-list input {
+  flex: 1;
+}
+
+.financial-table, .ethics-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+.financial-table th, .ethics-table th {
+  background: rgba(6, 182, 212, 0.12);
+  color: var(--aurora-cyan);
+  border: 1px solid var(--border-subtle);
+  padding: 10px;
+  text-align: left;
+}
+.financial-table td, .ethics-table td {
+  border: 1px solid var(--border-subtle);
+  padding: 8px;
+}
+.financial-table input, .ethics-table textarea {
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 0.84rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-input);
+  color: var(--text-primary);
+}
+
+/* ==========================================================================
+   MODUL 4: REPRODUKSI & KARTU TEBAK
+   ========================================================================== */
+.repro-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+.guess-card {
+  perspective: 1000px;
+  cursor: pointer;
+  min-height: 160px;
+}
+.guess-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 160px;
+  border-radius: 14px;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+.guess-card.flipped .guess-card-inner {
+  transform: rotateY(180deg);
+}
+.guess-front, .guess-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+  backface-visibility: hidden;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.guess-front {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(99, 102, 241, 0.15) 100%);
+  border: 1px solid var(--border-aurora);
+  text-align: center;
+  align-items: center;
+}
+.card-tag {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--aurora-cyan);
+  margin-bottom: 6px;
+}
+.guess-front b {
+  font-size: 1.05rem;
+  color: var(--text-primary);
+}
+.tap-hint {
+  font-size: 0.72rem;
+  color: var(--aurora-sky);
+  margin-top: 10px;
+}
+.guess-back {
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid var(--aurora-cyan);
+  box-shadow: 0 8px 25px rgba(6, 182, 212, 0.25);
+  transform: rotateY(180deg);
+  overflow-y: auto;
+}
+.guess-back p {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.family-plan-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ==========================================================================
+   MODUL 5: GENERASI BERKUALITAS & TUGAS ORANG TUA
+   ========================================================================== */
+.four-tasks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin: 18px 0;
+}
+.task-box {
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 16px;
+}
+.task-box h4 {
+  margin: 0 0 6px 0;
+  color: var(--aurora-gold);
+  font-size: 0.96rem;
+}
+.task-box p {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.parenting-quiz-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.quiz-item-card {
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+.quiz-item-card p {
+  margin: 0 0 12px 0;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+}
+.quiz-options-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pill-label {
+  cursor: pointer;
+}
+.pill-label input {
+  display: none;
+}
+.pill-label span {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+.pill-label input:checked + span {
+  background: var(--aurora-cyan);
+  color: #070b14;
+  border-color: transparent;
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.4);
+}
+.quiz-feedback {
+  margin-top: 10px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.quiz-feedback.correct {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.quiz-feedback.wrong {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+.quiz-feedback.unselected {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+}
+.quiz-score-box {
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid var(--border-aurora);
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+  margin-top: 16px;
+}
+.quiz-score-box h4 {
+  margin: 0;
+  color: var(--aurora-cyan);
+  font-size: 1.15rem;
+}
+
+.dream-table-grid, .dos-donts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 12px;
+}
+.dream-col, .dos-col, .donts-col {
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.dos-col b { color: #34d399; }
+.donts-col b { color: #f87171; }
+.dos-col input, .donts-col input {
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-input);
+  color: var(--text-primary);
+}
+
+.agreement-gold-card {
+  border-color: rgba(251, 191, 36, 0.4);
+  background: linear-gradient(180deg, rgba(251, 191, 36, 0.05) 0%, rgba(15, 23, 42, 0.7) 100%);
+  margin-top: 24px;
+}
+.agreement-title {
+  color: #fbbf24;
+  letter-spacing: 0.08em;
+  font-size: 1.45rem;
+  margin: 4px 0;
+}
+.agreement-body-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .river-form-grid, .bank-4-grid, .needs-grid, .form-grid-love, .dream-table-grid, .dos-donts-grid {
+    grid-template-columns: 1fr;
+  }
+  .house-pillars {
+    gap: 6px;
+  }
+  .pillar-shaft span {
+    font-size: 0.58rem;
+  }
+  .pillar-shaft small {
+    display: none;
+  }
+  .foundation-block {
+    font-size: 0.65rem;
+    padding: 8px 4px;
+  }
+}
