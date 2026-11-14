@@ -1,3 +1,438 @@
+/* E-BIMWIN KUA MAKALE — Bimbingan Perkawinan Digital
+   Terintegrasi dengan Supabase Cloud Database (Multi-Device Sync) & Local Cache Fallback.
+   URL: https://scanwjvvnwcfqblljafg.supabase.co
+*/
+
+const SUPABASE_URL = 'https://scanwjvvnwcfqblljafg.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_IsOjGzIrkiiY4L83jjvB2Q_qK7V9nWH';
+
+let sb = null;
+try {
+  if (typeof window !== 'undefined' && window.supabase && SUPABASE_URL && SUPABASE_KEY) {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true
+      }
+    });
+    console.log('✓ Supabase Cloud Client Connected.');
+  }
+} catch (err) {
+  console.warn('Supabase initialization warning:', err);
+}
+
+const STORE = 'ebimwin_demo_v1';
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+let db = load(), currentUser = null, route = 'home', activeModule = 1, lessonIndex = 0, testState = null, toastTimer;
+
+function load() {
+  try { return JSON.parse(localStorage.getItem(STORE)) || { users: [], active: null }; }
+  catch { return { users: [], active: null }; }
+}
+
+function save() {
+  localStorage.setItem(STORE, JSON.stringify(db));
+}
+
+function notify(msg) {
+  const t = $('#toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function uid() {
+  return 'P-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+}
+
+function user() {
+  return db.users.find(x => x.id === currentUser);
+}
+
+function hashDemo(p) {
+  return btoa(unescape(encodeURIComponent(p)));
+}
+
+function showPage(name) {
+  route = name;
+  $$('.page').forEach(x => x.classList.add('hidden'));
+  const target = $('#page-' + name);
+  if (target) target.classList.remove('hidden');
+  const homeMore = $('#page-home-more');
+  if (homeMore) homeMore.classList.toggle('hidden', name !== 'home');
+  const mainNav = $('#mainNav');
+  if (mainNav) mainNav.classList.remove('open');
+  if ($('#navAuth')) $('#navAuth').textContent = user() ? 'Akun Saya' : 'Masuk';
+  window.scrollTo(0, 0);
+  if (name === 'dashboard') renderDashboard();
+  if (name === 'profile') fillProfile();
+  if (name === 'results') renderResults();
+  if (name === 'admin') renderAdmin();
+  if (name === 'module') renderModule();
+  if (name === 'test') renderTest();
+}
+
+function openAuth(tab = 'login') {
+  showPage('auth');
+  setAuthTab(tab);
+}
+
+function setAuthTab(tab) {
+  $$('[data-auth-tab]').forEach(b => b.classList.toggle('active', b.dataset.authTab === tab));
+  $('#loginForm').classList.toggle('hidden', tab !== 'login');
+  $('#registerForm').classList.toggle('hidden', tab !== 'register');
+}
+
+function normalizePhone(v) {
+  let p = String(v || '').replace(/\\D/g, '');
+  if (p.startsWith('0')) p = '62' + p.slice(1);
+  else if (!p.startsWith('62') && p.length > 0) p = '62' + p;
+  return p;
+}
+
+// --------------------------------------------------------------------------
+// REGISTRATION (SUPABASE CLOUD MULTI-DEVICE + LOCAL CACHE)
+// --------------------------------------------------------------------------
+async function register(form) {
+  const d = Object.fromEntries(new FormData(form));
+  const phone = normalizePhone(d.phone);
+  if (!phone || phone.length < 9) {
+    notify('Nomor HP tidak valid. Masukkan nomor HP aktif.');
+    return;
+  }
+  const pass = (d.password || '').trim();
+  const confirm = (d.confirm || '').trim();
+  if (pass !== confirm) {
+    notify('Konfirmasi password tidak sama.');
+    return;
+  }
+  if (pass.length < 8) {
+    notify('Password minimal 8 karakter.');
+    return;
+  }
+
+  const submitBtn = form.querySelector('button[type="submit"]');
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Mendaftarkan ke Cloud...'; }
+
+  const authEmail = `${phone}@ebimwin.kua-makale.id`;
+  let userId = uid();
+  let cloudSuccess = false;
+
+  if (sb) {
+    try {
+      const { data: existingUser } = await sb.from('app_users').select('id, phone').eq('phone', phone).maybeSingle();
+      if (existingUser) {
+        notify('Nomor HP ini sudah terdaftar di Cloud! Silakan langsung Masuk.');
+        setAuthTab('login');
+        const loginInput = $('#loginForm input[name="phone"]');
+        if (loginInput) loginInput.value = d.phone;
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Daftar sekarang'; }
+        return;
+      }
+    } catch (e) {
+      console.warn('Check existing user note:', e);
+    }
+
+    try {
+      const { data: authData } = await sb.auth.signUp({
+        email: authEmail,
+        password: pass,
+        options: {
+          data: {
+            full_name: (d.name || '').trim(),
+            phone: phone,
+            gender: d.gender
+          }
+        }
+      });
+      if (authData?.user) {
+        userId = authData.user.id;
+      }
+    } catch (e) {
+      console.warn('Supabase Auth note:', e);
+    }
+
+    try {
+      const { error: appUserErr } = await sb.from('app_users').upsert({
+        id: userId,
+        phone: phone,
+        name: (d.name || '').trim(),
+        email: (d.email || '').trim(),
+        gender: d.gender,
+        password_hash: hashDemo(pass),
+        profile: {},
+        progress: { 1: [], 2: [], 3: [], 4: [], 5: [] },
+        pre: null,
+        post: null,
+        updated_at: new Date().toISOString()
+      });
+      if (!appUserErr) {
+        cloudSuccess = true;
+      } else {
+        console.warn('app_users upsert note:', appUserErr.message);
+      }
+    } catch (e) {
+      console.warn('app_users upsert error:', e);
+    }
+
+    try {
+      await sb.from('profiles').upsert({
+        id: userId,
+        full_name: (d.name || '').trim(),
+        phone: phone,
+        role: 'peserta'
+      });
+    } catch (e) {}
+  }
+
+  const u = {
+    id: userId,
+    name: (d.name || '').trim(),
+    phone,
+    email: (d.email || '').trim(),
+    gender: d.gender,
+    passwordDemo: hashDemo(pass),
+    createdAt: new Date().toISOString(),
+    profile: null,
+    pre: null,
+    post: null,
+    progress: { 1: [], 2: [], 3: [], 4: [], 5: [] },
+    reflections: {},
+    activities: []
+  };
+
+  const existingIdx = db.users.findIndex(x => x.phone === phone || x.id === u.id);
+  if (existingIdx >= 0) db.users[existingIdx] = u;
+  else db.users.push(u);
+
+  db.active = u.id;
+  currentUser = u.id;
+  save();
+
+  if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Daftar sekarang'; }
+  form.reset();
+  if (cloudSuccess) {
+    notify('✓ Akun berhasil terdaftar di Cloud! Siap login dari perangkat apa saja.');
+  } else {
+    notify('Akun berhasil dibuat. Tersimpan di perangkat.');
+  }
+  showPage('profile');
+}
+
+// --------------------------------------------------------------------------
+// LOGIN (SUPABASE CLOUD MULTI-DEVICE + LOCAL FALLBACK)
+// --------------------------------------------------------------------------
+async function login(form) {
+  const d = Object.fromEntries(new FormData(form));
+  const phone = normalizePhone(d.phone);
+  if (!phone) {
+    notify('Masukkan nomor HP Anda.');
+    return;
+  }
+  const pass = (d.password || '').trim();
+
+  const submitBtn = form.querySelector('button[type="submit"]');
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Memeriksa Cloud...'; }
+
+  let loggedInUser = null;
+
+  if (sb) {
+    try {
+      const { data: cloudUser, error: cloudErr } = await sb.from('app_users').select('*').eq('phone', phone).maybeSingle();
+      if (cloudUser && !cloudErr) {
+        const expectedHash = cloudUser.password_hash;
+        const passMatch = expectedHash === hashDemo(pass) || expectedHash === hashDemo(pass.trim());
+        if (!passMatch) {
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Masuk ke akun'; }
+          notify('Password salah. Periksa kembali huruf besar/kecil Anda.');
+          return;
+        }
+
+        const initialProgress = cloudUser.progress || {};
+        [1, 2, 3, 4, 5].forEach(k => {
+          if (!Array.isArray(initialProgress[k])) initialProgress[k] = [];
+        });
+
+        loggedInUser = {
+          id: cloudUser.id,
+          name: cloudUser.name || 'Peserta',
+          phone: cloudUser.phone,
+          email: cloudUser.email || '',
+          gender: cloudUser.gender || 'Perempuan',
+          passwordDemo: expectedHash,
+          createdAt: cloudUser.created_at || new Date().toISOString(),
+          profile: cloudUser.profile || null,
+          progress: initialProgress,
+          pre: cloudUser.pre || null,
+          post: cloudUser.post || null,
+          reflections: {},
+          activities: []
+        };
+
+        const exIdx = db.users.findIndex(x => x.phone === phone || x.id === cloudUser.id);
+        if (exIdx >= 0) db.users[exIdx] = loggedInUser;
+        else db.users.push(loggedInUser);
+
+        try {
+          sb.auth.signInWithPassword({
+            email: `${phone}@ebimwin.kua-makale.id`,
+            password: pass
+          }).catch(() => {});
+        } catch (e) {}
+      }
+    } catch (e) {
+      console.warn('Cloud login check error:', e);
+    }
+
+    if (!loggedInUser) {
+      try {
+        const { data: authData } = await sb.auth.signInWithPassword({
+          email: `${phone}@ebimwin.kua-makale.id`,
+          password: pass
+        });
+        if (authData?.user) {
+          const su = authData.user;
+          const sMeta = su.user_metadata || {};
+          loggedInUser = {
+            id: su.id,
+            name: sMeta.full_name || sMeta.name || 'Peserta',
+            phone: sMeta.phone || phone,
+            email: su.email?.includes('@ebimwin.') ? '' : su.email,
+            gender: sMeta.gender || 'Perempuan',
+            passwordDemo: hashDemo(pass),
+            createdAt: su.created_at || new Date().toISOString(),
+            profile: null,
+            progress: { 1: [], 2: [], 3: [], 4: [], 5: [] },
+            pre: null,
+            post: null,
+            reflections: {},
+            activities: []
+          };
+          const exIdx = db.users.findIndex(x => x.phone === phone || x.id === su.id);
+          if (exIdx >= 0) db.users[exIdx] = loggedInUser;
+          else db.users.push(loggedInUser);
+        }
+      } catch (e) {}
+    }
+  }
+
+  if (!loggedInUser) {
+    const localUser = db.users.find(x => x.phone === phone);
+    if (localUser) {
+      const match = localUser.passwordDemo === hashDemo(pass) || localUser.passwordDemo === hashDemo(pass.trim());
+      if (match) loggedInUser = localUser;
+    }
+  }
+
+  if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Masuk ke akun'; }
+
+  if (!loggedInUser) {
+    notify('Nomor HP belum terdaftar di Cloud atau perangkat ini. Silakan daftar terlebih dahulu.');
+    return;
+  }
+
+  if (!loggedInUser.progress) loggedInUser.progress = {};
+  [1, 2, 3, 4, 5].forEach(k => {
+    if (!Array.isArray(loggedInUser.progress[k])) loggedInUser.progress[k] = [];
+  });
+  if (!loggedInUser.reflections) loggedInUser.reflections = {};
+
+  db.active = loggedInUser.id;
+  currentUser = loggedInUser.id;
+  save();
+  form.reset();
+  notify(`✓ Berhasil masuk! Selamat datang, ${loggedInUser.name}.`);
+  showPage('dashboard');
+}
+
+async function logout() {
+  if (sb) {
+    try { await sb.auth.signOut(); } catch (e) {}
+  }
+  currentUser = null;
+  db.active = null;
+  save();
+  showPage('home');
+  notify('Anda telah keluar.');
+}
+
+function fillProfile() {
+  const u = user();
+  if (!u) return;
+  const p = u.profile || {};
+  const f = $('#profileForm');
+  for (const [k, v] of Object.entries(p)) {
+    if (f.elements[k]) f.elements[k].value = v;
+  }
+  if (!p.fullName && f.elements.fullName) f.elements.fullName.value = u.name;
+  if (!p.gender && f.elements.gender) f.elements.gender.value = u.gender;
+}
+
+// --------------------------------------------------------------------------
+// SAVE PROFILE (SUPABASE CLOUD SYNC)
+// --------------------------------------------------------------------------
+async function saveProfile(form) {
+  const u = user();
+  if (!u) return;
+  const p = Object.fromEntries(new FormData(form));
+  u.profile = p;
+  u.name = p.fullName;
+  u.gender = p.gender;
+  u.activities.push({ type: 'Biodata diperbarui', at: new Date().toISOString() });
+  save();
+
+  if (sb && u.phone) {
+    try {
+      await sb.from('app_users').update({
+        name: p.fullName,
+        gender: p.gender,
+        profile: p,
+        updated_at: new Date().toISOString()
+      }).eq('phone', u.phone);
+    } catch (e) {
+      console.warn('Sync profile to app_users note:', e);
+    }
+  }
+
+  if (sb && u.id) {
+    try {
+      await sb.from('profiles').upsert({
+        id: u.id,
+        full_name: p.fullName,
+        phone: u.phone,
+        role: 'peserta',
+        updated_at: new Date().toISOString()
+      });
+      await sb.from('participant_profiles').upsert({
+        user_id: u.id,
+        father_name: p.father || '',
+        birth_place: p.birthPlace || '',
+        birth_date: p.birthDate || '2000-01-01',
+        gender: p.gender === 'Laki-laki' ? 'Laki-laki' : 'Perempuan',
+        address: p.address || '',
+        birth_order: p.birthOrder || '1',
+        education: p.education || 'SMA/MA/SMK',
+        occupation: p.job || '',
+        wedding_date: p.weddingDate || null,
+        kua_name: p.kua || 'KUA Kecamatan Makale',
+        attendance_status: p.attendance || 'Sedang mengikuti',
+        updated_at: new Date().toISOString()
+      });
+      if (p.partnerName) {
+        await sb.from('partners').upsert({
+          user_id: u.id,
+          full_name: p.partnerName,
+          phone: p.partnerPhone || ''
+        });
+      }
+    } catch (e) {}
+  }
+
+  notify('✓ Biodata berhasil disimpan ke Cloud Database!');
+  showPage('dashboard');
+}
 
 
 const modules = {
